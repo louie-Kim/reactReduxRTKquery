@@ -1,0 +1,135 @@
+apiSlice
+태그와 연결된 쿼리
+
+deletePost / updatePost => fetchPostById
+
+1.deletePost ,updatePost에서 **invalidatesTags**로 태그 무효화를 설정.
+2.동일한 태그를 제공(providesTags)하는 fetchPostById가 자동으로 다시 리패칭됨.
+3.RTK Query는 태그 기반으로 '쿼리와 변이'를 연결하여 
+(builder.query : builder.mutation)
+최신 상태 유지를 자동화합니다.
+
+
+{
+  "api": {
+    "queries": {
+      "getPosts(undefined)": {
+        "status": "fulfilled", // 현재 상태: "pending", "fulfilled", "rejected" 등
+        "data": {
+          "ids": ["1", "2", "3"], // API에서 받은 데이터의 ID 배열
+          "entities": { // 각 ID에 해당하는 데이터
+            "1": {
+              "id": "1",
+              "title": "Post 1",
+              "content": "Content of post 1",
+              "date": "2024-11-22T10:00:00.000Z",
+              "reactions": {
+                "thumbsUp": 2,
+                "wow": 0,
+                "heart": 1,
+                "rocket": 0,
+                "coffee": 0
+              }
+            },
+            "2": {
+              "id": "2",
+              "title": "Post 2",
+              "content": "Content of post 2",
+              "date": "2024-11-22T10:01:00.000Z",
+              "reactions": {
+                "thumbsUp": 0,
+                "wow": 3,
+                "heart": 0,
+                "rocket": 2,
+                "coffee": 1
+              }
+            }
+          }
+        }
+      },
+      "getPostsByUserId({id: 1})": {
+        "status": "fulfilled",
+        "data": {
+          "ids": ["2"], // 특정 유저에 해당하는 게시물의 ID
+          "entities": {
+            "2": {
+              "id": "2",
+              "title": "Post 2",
+              "content": "Content of post 2",
+              "date": "2024-11-22T10:01:00.000Z",
+              "reactions": {
+                "thumbsUp": 0,
+                "wow": 3,
+                "heart": 0,
+                "rocket": 2,
+                "coffee": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "mutations": {
+      "addNewPost": {
+        "status": "pending" // 새로운 게시물 추가 상태
+      },
+      "updatePost": {
+        "status": "fulfilled" // 게시물 업데이트 성공
+      },
+      "deletePost": {
+        "status": "rejected", // 게시물 삭제 실패
+        "error": "Network error"
+      }
+    },
+    "provided": {
+      "Post": {
+        "LIST": {
+          "data": [
+            "1",
+            "2",
+            "3"
+          ] // 전체 게시물 ID 목록 캐싱
+        },
+        "1": {
+          "data": {
+            "id": "1",
+            "title": "Post 1"
+          }
+        },
+        "2": {
+          "data": {
+            "id": "2",
+            "title": "Post 2"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+-----------------------------------------------------------------------------
+태그 제공 (providesTags)
+
+providesTags: (result) => [
+    { type: 'Post', id: "LIST" }, 
+    ...result.ids.map(id => ({ type: 'Post', id }))
+]
+
+태그 무효화 (invalidatesTags)
+
+invalidatesTags: [
+    { type: 'Post', id: "LIST" }, // 전체 리스트 무효화
+    { type: 'Post', id: 1 }       // ID 1의 게시물만 무효화
+]
+
+
+
+
+
+
+
+
+
+
+
