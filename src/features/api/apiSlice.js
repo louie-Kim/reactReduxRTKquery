@@ -7,10 +7,3 @@ export const apiSlice = createApi({
     endpoints: (builder) => ({}),
 });
 
-// export const {
-//     useFetchPostsQuery,
-//     useFetchPostByIdQuery,
-//     useCreatePostMutation,
-//     useUpdatePostMutation,
-//     useDeletePostMutation,
-// } = apiSlice;

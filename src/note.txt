@@ -119,10 +119,26 @@ providesTags: (result) => [
 태그 무효화 (invalidatesTags)
 
 invalidatesTags: [
-    { type: 'Post', id: "LIST" }, // 전체 리스트 무효화
+    { type: 'Post', id: "LIST" }, // 전체 리스트 무효화 -> 리패칭
     { type: 'Post', id: 1 }       // ID 1의 게시물만 무효화
 ]
 
+-----------------------------------------------------------------------------
+
+컨포넌트 구조 
+
+
+App (최상위 부모 컴포넌트)
+├── Layout (중간 부모 컴포넌트)
+│   ├── Header (공통 자식 컴포넌트)
+│   └── Outlet (중첩된 라우트 렌더링)
+│       ├── PostsList ("/" 경로)
+│       ├── AddPostForm ("/post" 경로)
+│       ├── SinglePostPage ("/post/:postId" 경로)
+│       ├── EditPostForm ("/post/edit/:postId" 경로)
+│       ├── UsersList ("/user" 경로)
+│       └── UserPage ("/user/:userId" 경로)
+└── Navigate (Catch-all route for undefined paths)
 
 
 

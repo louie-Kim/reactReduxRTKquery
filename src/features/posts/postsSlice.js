@@ -10,11 +10,14 @@ const postsAdapter = createEntityAdapter({
 })
 
 const initialState = postsAdapter.getInitialState()
+// console.log(initialState); // ids[], entities{}
+
 
 // extend apiSlice
 export const extendedApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getPosts: builder.query({
+            
             query: () => '/posts',
             transformResponse: responseData => {
                 // date, reactions 속성 추가
@@ -28,6 +31,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                         rocket: 0,
                         coffee: 0
                     }
+                    console.log("getPosts post", post);
                     return post;
                 });
                 // set normalized data  : [ ids , entities ] -> result
@@ -59,6 +63,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 return postsAdapter.setAll(initialState, loadedPosts)
             },
             providesTags: (result, error, arg) => [
+                // console.log('getPostsByUserId result', result);
+                
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
         }),
@@ -107,6 +113,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 { type: 'Post', id: arg.id }
             ]
         }),
+
+        
         addReaction: builder.mutation({
             query: ({ postId, reactions }) => ({
                 url: `posts/${postId}`,
@@ -115,12 +123,19 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 // so that a user can't do the same reaction more than once
                 body: { reactions }
             }),
+
+            // Optimistic Update
+            // { postId, reactions } : 요청데이터
+            // queryFulfilled :  서버 요청의 성공 또는 실패를 처리하는 Promise
             async onQueryStarted({ postId, reactions }, { dispatch, queryFulfilled }) {
                 // `updateQueryData` requires the endpoint name and cache key arguments,
                 // so it knows which piece of cache state to update
+                // undefined: 업데이트 범위: 전체 게시물 목록
+                // { userId: 1 } : 특정게시물 reactions 업데이트 
                 const patchResult = dispatch(
                     extendedApiSlice.util.updateQueryData('getPosts', undefined, draft => {
-                        // The `draft` is Immer-wrapped and can be "mutated" like in createSlice
+                        // draft는 createEntityAdapter가 생성한 엔티티 상태 형식
+                        // (ids, entities)을 따릅니다.
                         const post = draft.entities[postId]
                         if (post) post.reactions = reactions
                     })
@@ -128,13 +143,14 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 try {
                     await queryFulfilled
                 } catch {
-                    patchResult.undo()
+                    patchResult.undo() // 서버 실패시 복원
                 }
             }
         })
     })
 })
 
+// RTK query hooks
 export const {
     useGetPostsQuery,
     useGetPostsByUserIdQuery,
@@ -154,13 +170,27 @@ const selectPostsData = createSelector(
     // iuput fucntion
     selectPostsResult,
     // output function
+    // return { ids: [1, 2], entities: { 1: { ... }, 2: { ... } } }
     postsResult => postsResult.data // normalized state object with ids & entities
 )
 
 //getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
-    selectAll: selectAllPosts,
-    selectById: selectPostById,
-    selectIds: selectPostIds
-    // Pass in a selector that returns the posts slice of state
+    selectAll: selectAllPosts,   //  모든 Post 객체 배열을 반환
+    selectById: selectPostById,  //  특정 ID에 해당하는 Post 객체를 반환
+    selectIds: selectPostIds     //  Post의 ID(key) 배열을 반환
 } = postsAdapter.getSelectors(state => selectPostsData(state) ?? initialState)
+
+
+// selectAllPosts
+// [
+//     { id: 1, title: 'First Post', ... },
+//     { id: 2, title: 'Second Post', ... }
+// ]
+
+// selectById(state, 1)
+// { id: 1, title: 'First Post', ... }
+
+// selectIds(state)
+// [1, 2]
+

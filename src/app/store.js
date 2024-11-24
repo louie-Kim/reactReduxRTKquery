@@ -9,6 +9,7 @@ export const store = configureStore({
     // for RTK query
     middleware: getDefaultMiddleware =>
         getDefaultMiddleware().concat(apiSlice.middleware), // 커스터마이징
+    // apiSlice.middleware : getPosts , getPostsByUserId, addNewPost ...
     devTools: true
 })
 
