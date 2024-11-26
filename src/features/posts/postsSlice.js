@@ -31,7 +31,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                         rocket: 0,
                         coffee: 0
                     }
-                    console.log("getPosts post", post);
+                    // console.log("getPosts post", post);
                     return post;
                 });
                 // set normalized data  : [ ids , entities ] -> result
@@ -45,6 +45,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
         }),
+        // getPosts의 쿼리를 덮어쓰기 하지 않고 쿼리 데이터를 따로 만듬
         getPostsByUserId: builder.query({
             query: id => `/posts/?userId=${id}`,
             transformResponse: responseData => {
@@ -60,11 +61,19 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                     }
                     return post;
                 });
-                return postsAdapter.setAll(initialState, loadedPosts)
+                return postsAdapter.setAll(initialState, loadedPosts) // -> result
             },
             providesTags: (result, error, arg) => [
-                // console.log('getPostsByUserId result', result);
-                
+                console.log('getPostsByUserId result', result),
+                // 게시물 ID가 [1, 2, 3]이라면
+                /**
+                 * [
+                        { type: 'Post', id: 1 },
+                        { type: 'Post', id: 2 },
+                        { type: 'Post', id: 3 }
+                    ]
+                    반환
+                 */
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
         }),
@@ -74,8 +83,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 method: 'POST',
                 body: {
                     ...initialPost,
-                    userId: Number(initialPost.userId),
-                    date: new Date().toISOString(),
+                    userId: Number(initialPost.userId), // userId 오버라이딩, 숫자로 만들려고
+                    date: new Date().toISOString(),     //현재 날짜와 시간을 ISO 8601 형식으로 반환
                     reactions: {
                         thumbsUp: 0,
                         wow: 0,
@@ -86,7 +95,8 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 }
             }),
             invalidatesTags: [
-                //  전체 Post 목록 무효화 -> getPosts 쿼리가 리패치
+                //  getPosts 무효화 -> getPosts 쿼리가 리패치
+                //  getPostsByUserId 무효화 안됨
                 { type: 'Post', id: "LIST" } 
             ]
         }),
@@ -99,7 +109,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                     date: new Date().toISOString()
                 }
             }),
+            // arg = initialPost
             invalidatesTags: (result, error, arg) => [
+                console.log('updatePost arg' , arg),
+                
                 { type: 'Post', id: arg.id }
             ]
         }),
@@ -110,6 +123,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 body: { id }
             }),
             invalidatesTags: (result, error, arg) => [
+                console.log('deletePost arg' , arg),
                 { type: 'Post', id: arg.id }
             ]
         }),
@@ -170,7 +184,7 @@ const selectPostsData = createSelector(
     // iuput fucntion
     selectPostsResult,
     // output function
-    // return { ids: [1, 2], entities: { 1: { ... }, 2: { ... } } }
+    // return { ids: [1, 2], entities: { 1: { ... }, 2: { ... }... } }
     postsResult => postsResult.data // normalized state object with ids & entities
 )
 

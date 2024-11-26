@@ -142,7 +142,15 @@ App (최상위 부모 컴포넌트)
 
 
 
+------------------------------------------------------------------------
 
+getPosts와 getPostsByUserId는 서로 다른 캐쉬 데이터를 관리
+
+
+태그 이름이 같아야 무효화 가능
+providesTags { type: 'Post', id: "LIST" } <--> invalidatesTags { type: 'Post', id: "LIST" }
+
+getPosts, getPostsByUserId... : 쿼리 함수이름
 
 
 
