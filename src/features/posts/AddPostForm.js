@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useGetUsersQuery } from "../users/usersSlice"
 import { selectAllUsers } from "../users/usersSlice";
@@ -8,6 +8,8 @@ import { useAddNewPostMutation } from "./postsSlice";
 const AddPostForm = () => {
     const [addNewPost, { isLoading }] = useAddNewPostMutation()
     // const { data: users, isError } = useGetUsersQuery();
+    
+    
 
     const navigate = useNavigate()
 
@@ -16,12 +18,18 @@ const AddPostForm = () => {
     const [userId, setUserId] = useState('')
 
     const users = useSelector(selectAllUsers)
-    console.log(users);
-    
+    // console.log(users);
+    // index에서 store.dispatch(usersApiSlice.endpoints.getUsers.initiate());
 
-    const onTitleChanged = e => setTitle(e.target.value)
-    const onContentChanged = e => setContent(e.target.value)
-    const onAuthorChanged = e => setUserId(e.target.value)
+    // const onTitleChanged = e => setTitle(e.target.value)
+    // const onContentChanged = e => setContent(e.target.value)
+    // const onAuthorChanged = e => setUserId(e.target.value)
+
+    useEffect(()=>{
+        // 초기값 false -> addNewPost() 호출 true -> 다시 false
+        console.log("isLoading", isLoading);
+        
+    }, [isLoading])
 
 
     const canSave = [title, content, userId].every(Boolean) && !isLoading;
@@ -31,8 +39,9 @@ const AddPostForm = () => {
     const onSavePostClicked = async () => {
         if (canSave) {
             try {
+                
                 await addNewPost({ title, body: content, userId }).unwrap()
-
+                
                 setTitle('')
                 setContent('')
                 setUserId('')
@@ -59,10 +68,15 @@ const AddPostForm = () => {
                     id="postTitle"
                     name="postTitle"
                     value={title}
-                    onChange={onTitleChanged}
+                    // onChange={onTitleChanged}
+                    onChange={e=>{ setTitle(e.target.value) }}
                 />
                 <label htmlFor="postAuthor">Author:</label>
-                <select id="postAuthor" value={userId} onChange={onAuthorChanged}>
+                <select id="postAuthor" 
+                    value={userId} 
+                    // onChange={onAuthorChanged}
+                    onChange={e=>{ setUserId(e.target.value) }}
+                    >
                     <option value=""></option>
                     {usersOptions}
                 </select>
@@ -71,7 +85,8 @@ const AddPostForm = () => {
                     id="postContent"
                     name="postContent"
                     value={content}
-                    onChange={onContentChanged}
+                    // onChange={onContentChanged}
+                    onChange={e=>{ setContent(e.target.value) }}
                 />
                 <button
                     type="button"

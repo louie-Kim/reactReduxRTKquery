@@ -1,9 +1,9 @@
 import PostsList from "./features/posts/PostsList"
 import AddPostForm from "./features/posts/AddPostForm";
-// import SinglePostPage from "./features/posts/SinglePostPage";
-// import EditPostForm from "./features/posts/EditPostForm";
-// import UsersList from "./features/users/UsersList";
-// import UserPage from './features/users/UserPage';
+import SinglePostPage from "./features/posts/SinglePostPage ";
+import EditPostForm from "./features/posts/EditPostForm ";
+import UsersList from "./features/users/UsersList ";
+import UserPage from './features/users/UserPage';
 import Layout from "./components/Layout";
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -16,14 +16,14 @@ function App() {
 
         <Route path="post">
           <Route index element={<AddPostForm />} />
-          {/* <Route path=":postId" element={<SinglePostPage />} />
-          <Route path="edit/:postId" element={<EditPostForm />} /> */}
+          <Route path=":postId" element={<SinglePostPage />} />
+          <Route path="edit/:postId" element={<EditPostForm />} />
         </Route>
 
-        {/* <Route path="user">
+        <Route path="user">
           <Route index element={<UsersList />} />
           <Route path=":userId" element={<UserPage />} />
-        </Route> */}
+        </Route>
 
         {/* Catch all - replace with 404 component if you want */}
         {/* 히스토리 스택에서 대체 : replace : 뒤로가기 안됨  */}

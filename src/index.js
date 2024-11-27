@@ -5,12 +5,12 @@ import App from './App';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import { extendedApiSlice } from './features/posts/postsSlice';
-// import { usersApiSlice } from './features/users/usersSlice';
+import { usersApiSlice } from './features/users/usersSlice';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Preload initial data
 store.dispatch(extendedApiSlice.endpoints.getPosts.initiate());
-// store.dispatch(usersApiSlice.endpoints.getUsers.initiate());
+store.dispatch(usersApiSlice.endpoints.getUsers.initiate());
 
 // React 18 방식으로 root 생성
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -49,6 +49,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         getPostsByUserId: builder.query({
             query: id => `/posts/?userId=${id}`,
             transformResponse: responseData => {
+                console.log("API responseData:", responseData); // API 응답 확인
                 let min = 1;
                 const loadedPosts = responseData.map(post => {
                     if (!post?.date) post.date = sub(new Date(), { minutes: min++ }).toISOString();
@@ -59,21 +60,15 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                         rocket: 0,
                         coffee: 0
                     }
+                    console.log("API responseData posts:", post); // API 응답 확인
                     return post;
                 });
                 return postsAdapter.setAll(initialState, loadedPosts) // -> result
             },
+            // responseData 가공 처리 -> result
             providesTags: (result, error, arg) => [
                 console.log('getPostsByUserId result', result),
-                // 게시물 ID가 [1, 2, 3]이라면
-                /**
-                 * [
-                        { type: 'Post', id: 1 },
-                        { type: 'Post', id: 2 },
-                        { type: 'Post', id: 3 }
-                    ]
-                    반환
-                 */
+              
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
         }),
@@ -111,7 +106,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             }),
             // arg = initialPost
             invalidatesTags: (result, error, arg) => [
-                console.log('updatePost arg' , arg),
+                // console.log('updatePost arg' , arg),
                 
                 { type: 'Post', id: arg.id }
             ]
