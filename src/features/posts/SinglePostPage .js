@@ -9,10 +9,14 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 const SinglePostPage = () => {
+
+    // http://localhost:3000/post/8
+
     const { postId } = useParams()
 
     const post = useSelector((state) => selectPostById(state, Number(postId)))
 
+    
     if (!post) {
         return (
             <section>

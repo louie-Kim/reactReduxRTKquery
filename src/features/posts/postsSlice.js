@@ -8,6 +8,7 @@ import { apiSlice } from "../api/apiSlice";
 const postsAdapter = createEntityAdapter({
     sortComparer: (a, b) => b.date.localeCompare(a.date) // 내림차순
 })
+// selectAll 또는 selectIds와 같은 배열 기반 메서드에서만 sortComparer가 영향
 
 const initialState = postsAdapter.getInitialState()
 // console.log(initialState); // ids[], entities{}
@@ -20,6 +21,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             
             query: () => '/posts',
             transformResponse: responseData => {
+                console.log('after update or delete');
                 // date, reactions 속성 추가
                 let min = 1;
                 const loadedPosts = responseData.map(post => {
@@ -49,7 +51,9 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         getPostsByUserId: builder.query({
             query: id => `/posts/?userId=${id}`,
             transformResponse: responseData => {
-                console.log("API responseData:", responseData); // API 응답 확인
+                console.log('after update or delete');
+                
+                // console.log("API responseData:", responseData); // API 응답 확인
                 let min = 1;
                 const loadedPosts = responseData.map(post => {
                     if (!post?.date) post.date = sub(new Date(), { minutes: min++ }).toISOString();
@@ -60,14 +64,16 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                         rocket: 0,
                         coffee: 0
                     }
-                    console.log("API responseData posts:", post); // API 응답 확인
+                    // console.log("API responseData posts:", post); // API 응답 확인
                     return post;
                 });
+                console.log("Normalized posts data:", postsAdapter.setAll(initialState, loadedPosts));
+
                 return postsAdapter.setAll(initialState, loadedPosts) // -> result
             },
             // responseData 가공 처리 -> result
             providesTags: (result, error, arg) => [
-                console.log('getPostsByUserId result', result),
+                // console.log('getPostsByUserId result', result),
               
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
@@ -105,11 +111,15 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 }
             }),
             // arg = initialPost
-            invalidatesTags: (result, error, arg) => [
-                // console.log('updatePost arg' , arg),
-                
-                { type: 'Post', id: arg.id }
-            ]
+            // invalidatesTags: (result, error, arg) => [
+            //     { type: 'Post', id: arg.id }
+            // ],
+
+            // getPosts 에서 리패칭
+            invalidatesTags: (result, error, arg) => {
+                console.log('updatePost arg', arg); 
+                return [{ type: 'Post', id: arg.id }];
+            }
         }),
         deletePost: builder.mutation({
             query: ({ id }) => ({
@@ -117,10 +127,15 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 method: 'DELETE',
                 body: { id }
             }),
-            invalidatesTags: (result, error, arg) => [
-                console.log('deletePost arg' , arg),
-                { type: 'Post', id: arg.id }
-            ]
+            // invalidatesTags: (result, error, arg) => [
+            //     { type: 'Post', id: arg.id }
+            // ]
+
+            // getPosts 에서 리패칭
+            invalidatesTags: (result, error, arg) => {
+                console.log('deletePost arg', arg); 
+                return [{ type: 'Post', id: arg.id }];
+            }
         }),
 
         
@@ -185,7 +200,7 @@ const selectPostsData = createSelector(
 
 //getSelectors creates these selectors and we rename them with aliases using destructuring
 export const {
-    selectAll: selectAllPosts,   //  모든 Post 객체 배열을 반환
+    selectAll: selectAllPosts,   //  모든 Post 객체 배열을 반환, 내림차순 정렬 반영됨
     selectById: selectPostById,  //  특정 ID에 해당하는 Post 객체를 반환
     selectIds: selectPostIds     //  Post의 ID(key) 배열을 반환
 } = postsAdapter.getSelectors(state => selectPostsData(state) ?? initialState)

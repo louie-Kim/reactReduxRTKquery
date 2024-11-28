@@ -7,6 +7,8 @@ import { selectAllUsers } from "../users/usersSlice";
 import { useUpdatePostMutation, useDeletePostMutation } from "./postsSlice";
 
 const EditPostForm = () => {
+
+    // http://localhost:3000/post/edit/8
     const { postId } = useParams()
     const navigate = useNavigate()
 
@@ -14,6 +16,9 @@ const EditPostForm = () => {
     const [deletePost] = useDeletePostMutation()
 
     const post = useSelector((state) => selectPostById(state, Number(postId)))
+
+    // console.log("EditForm post", post);
+    
     const users = useSelector(selectAllUsers)
 
     const [title, setTitle] = useState(post?.title)
@@ -38,7 +43,7 @@ const EditPostForm = () => {
         if (canSave) {
             try {
                 await updatePost({ id: post.id, title, body: content, userId }).unwrap()
-
+                // isLoading -> true
                 setTitle('')
                 setContent('')
                 setUserId('')

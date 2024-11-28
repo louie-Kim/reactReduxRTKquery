@@ -4,9 +4,12 @@ import { Link } from 'react-router-dom'
 
 const UsersList = () => {
     const users = useSelector(selectAllUsers)
+    // console.log(users);
+    
 
     const renderedUsers = users.map(user => (
         <li key={user.id}>
+            {/* user.id -> userId로 받음 ( UserPage ) */}
             <Link to={`/user/${user.id}`}>{user.name}</Link>
         </li>
     ))
