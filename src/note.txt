@@ -193,6 +193,33 @@ result.error와 result.data를 수동으로 확인해야 함.
 
 
 
+-------------------------------------------------------------------
+
+오버 라이딩
+기존 객체(reactions)를 복사하고, 특정 키-값 쌍만 동적 업데이트
+
+
+const post = {
+    reactions: { like: 2, love: 3, haha: 1 }
+};
+
+const name = 'like';
+const newValue = post.reactions[name] + 1;
+
+const updatedReactions = { 
+    ...post.reactions, 
+    [name]: newValue 
+};
+
+updatedReactions
+// { like: 3, love: 3, haha: 1 }
+
+
+
+
+
+
+
 
 
 

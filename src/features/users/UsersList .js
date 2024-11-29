@@ -3,6 +3,8 @@ import { selectAllUsers } from './usersSlice'
 import { Link } from 'react-router-dom'
 
 const UsersList = () => {
+
+    // http://localhost:3000/user
     const users = useSelector(selectAllUsers)
     // console.log(users);
     

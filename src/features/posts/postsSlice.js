@@ -140,13 +140,28 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
 
         
         addReaction: builder.mutation({
-            query: ({ postId, reactions }) => ({
-                url: `posts/${postId}`,
-                method: 'PATCH',
-                // In a real app, we'd probably need to base this on user ID somehow
-                // so that a user can't do the same reaction more than once
-                body: { reactions }
-            }),
+            // postId = post.id from reactionButtons component
+            // query: ({ postId, reactions }) => ({
+            //     url: `posts/${postId}`,
+            //     method: 'PATCH',
+            //     // In a real app, we'd probably need to base this on user ID somehow
+            //     // so that a user can't do the same reaction more than once
+            //     body: { reactions }
+            // }),
+            query: ({ postId, reactions }) => {
+                // Logging postId and reactions
+                console.log('Logging postId in query:', postId);
+                console.log('Logging reactions in query:', reactions);
+            
+                return {
+                    url: `posts/${postId}`,
+                    method: 'PATCH',
+                    // In a real app, we'd probably need to base this on user ID somehow
+                    // so that a user can't do the same reaction more than once
+                    body: { reactions }
+                };
+            },
+            
 
             // Optimistic Update
             // { postId, reactions } : 요청데이터
@@ -156,11 +171,13 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 // so it knows which piece of cache state to update
                 // undefined: 업데이트 범위: 전체 게시물 목록
                 // { userId: 1 } : 특정게시물 reactions 업데이트 
+            
                 const patchResult = dispatch(
                     extendedApiSlice.util.updateQueryData('getPosts', undefined, draft => {
                         // draft는 createEntityAdapter가 생성한 엔티티 상태 형식
                         // (ids, entities)을 따릅니다.
-                        const post = draft.entities[postId]
+                        
+                        const post = draft.entities[postId]  // object look up
                         if (post) post.reactions = reactions
                     })
                 )

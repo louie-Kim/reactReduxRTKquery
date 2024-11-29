@@ -13,7 +13,7 @@ const PostsList = () => {
     } = useGetPostsQuery()
 
     const orderedPostIds = useSelector(selectPostIds)
-    // console.log('postId',orderedPostIds);
+    // console.log('postId',orderedPostIds);  ids[]: 번호
     
 
     let content;
