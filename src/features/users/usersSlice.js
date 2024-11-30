@@ -22,8 +22,22 @@ export const usersApiSlice = apiSlice.injectEndpoints({
                 return usersAdapter.setAll(initialState, responseData)
             },
             providesTags: (result, error, arg) => [
-                { type: 'User', id: "LIST" },
-                ...result.ids.map(id => ({ type: 'User', id }))
+                // id: "SUCK" : User  전체 데이터를 대표하거나 그룹화(grouping)하는 역할
+                // 이 태그는 데이터 변경 시 한꺼번에 해당 태그와 연결된 모든 데이터를 무효화 
+                // 새로고침하는 데 사용
+                //   {
+                //   "provided": {
+                //     "User": {
+                //       "SUCK": { /* 모든 사용자 데이터를 대표 */ },
+                //       "1": { /* 사용자 ID 1의 데이터 */ },
+                //       "2": { /* 사용자 ID 2의 데이터 */ },
+                //       "3": { /* 사용자 ID 3의 데이터 */ }
+                //     }
+                //   }
+                // }
+                 
+                { type: 'User', id: "SUCK" }, // 전체 데이터 리패칭
+                ...result.ids.map(id => ({ type: 'User', id })) // 개별 데이터 리패칭
             ]
         })
     })
@@ -35,6 +49,7 @@ export const {
 
 // returns the query result object
 export const selectUsersResult = usersApiSlice.endpoints.getUsers.select()
+
 
 // Creates memoized selector
 const selectUsersData = createSelector(

@@ -21,7 +21,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             
             query: () => '/posts',
             transformResponse: responseData => {
-                console.log('after update or delete');
+                console.log("Fetching data from /posts...");
                 // date, reactions 속성 추가
                 let min = 1;
                 const loadedPosts = responseData.map(post => {
@@ -49,9 +49,10 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
         }),
         // getPosts의 쿼리를 덮어쓰기 하지 않고 쿼리 데이터를 따로 만듬
         getPostsByUserId: builder.query({
-            query: id => `/posts/?userId=${id}`,
+            query: id => `/posts/?userId=${id}`,  // newwork탭에  http://localhost:5000/posts/?userId=2  
+           
             transformResponse: responseData => {
-                console.log('after update or delete');
+                console.log("Fetching data from /posts/?userId=${id}");
                 
                 // console.log("API responseData:", responseData); // API 응답 확인
                 let min = 1;
@@ -118,7 +119,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             // getPosts 에서 리패칭
             invalidatesTags: (result, error, arg) => {
                 console.log('updatePost arg', arg); 
-                return [{ type: 'Post', id: arg.id }];
+                return [{ type: 'Post', id: arg.id }]; // to getPosts -> ...result.ids.map(id => ({ type: 'Post', id })) 리패칭 
             }
         }),
         deletePost: builder.mutation({
@@ -134,7 +135,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             // getPosts 에서 리패칭
             invalidatesTags: (result, error, arg) => {
                 console.log('deletePost arg', arg); 
-                return [{ type: 'Post', id: arg.id }];
+                return [{ type: 'Post', id: arg.id }]; // to getPosts -> ...result.ids.map(id => ({ type: 'Post', id })) 리패칭 
             }
         }),
 

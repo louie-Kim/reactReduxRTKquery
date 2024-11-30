@@ -215,6 +215,34 @@ updatedReactions
 // { like: 3, love: 3, haha: 1 }
 
 
+----------------------------------------------------------------------------------
+
+{ type: 'User', id: "SUCK" } 
+
+// 전체 데이터 리패칭
+1. store.dispatch(usersApiSlice.util.invalidateTags([{ type: 'User', id: "SUCK" }])); ->
+2. providesTags: (result, error, arg) => [
+                { type: 'User', id: "SUCK" },
+            ]
+
+// 개별적으로 데이터 리패칭 -> 비효율적
+  1.store.dispatch(usersApiSlice.util.invalidateTags([
+      { type: 'User', id: "1" },
+      { type: 'User', id: "2" },
+      { type: 'User', id: "3" }
+  ]));
+
+
+  2.  providesTags: (result, error, arg) => [
+   ...result.ids.map(id => ({ type: 'User', id }))
+            ]
+
+
+// invalidateTags -> providesTags : Network탭 Request URL 로 확인 가능!!
+
+
+
+
 
 
 
