@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectPostIds } from "./postsSlice";
+import { selectPostIds, selectAllPosts } from "./postsSlice";
 import  PostsExcerpt  from './PostsExcerpt'
 import { useGetPostsQuery } from './postsSlice';
 
@@ -13,7 +13,10 @@ const PostsList = () => {
     } = useGetPostsQuery()
 
     const orderedPostIds = useSelector(selectPostIds)
-    // console.log('postId',orderedPostIds);  ids[]: 번호
+    // console.log('postId',orderedPostIds);  //ids[]: 번호
+
+    // const orderedPosts = useSelector(selectAllPosts);
+    // console.log('정렬됬나?',orderedPosts); 
     
 
     let content;

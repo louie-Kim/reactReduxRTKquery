@@ -11,7 +11,7 @@ const reactionEmoji = {
 const ReactionButtons = ({ post }) => {
 
     // console.log("ReactionButtons post",post);
-    // console.log("ReactionButtons post",post.reactions);
+    console.log("ReactionButtons post",post.reactions);
     
 
     const [addReaction] = useAddReactionMutation()
@@ -20,7 +20,7 @@ const ReactionButtons = ({ post }) => {
     // console.log(Object.entries(reactionEmoji));
     /**
      * [
-        *  [  key  ,  value],
+        *   [  key  ,  value],
             ['thumbsUp', '👍'],
             ['wow', '😮'],
             ['heart', '❤️'],

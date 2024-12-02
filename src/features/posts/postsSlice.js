@@ -6,7 +6,10 @@ import { sub } from 'date-fns';
 import { apiSlice } from "../api/apiSlice";
 
 const postsAdapter = createEntityAdapter({
+    // 인메모리 방식 -> f5 데이터 날라감
     sortComparer: (a, b) => b.date.localeCompare(a.date) // 내림차순
+    // sortComparer: (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+
 })
 // selectAll 또는 selectIds와 같은 배열 기반 메서드에서만 sortComparer가 영향
 
@@ -47,7 +50,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
                 ...result.ids.map(id => ({ type: 'Post', id }))
             ]
         }),
-        // getPosts의 쿼리를 덮어쓰기 하지 않고 쿼리 데이터를 따로 만듬
+        // getPosts의따 쿼리를 덮어쓰기 하지 않고 쿼리 데이터를 로 만듬
         getPostsByUserId: builder.query({
             query: id => `/posts/?userId=${id}`,  // newwork탭에  http://localhost:5000/posts/?userId=2  
            
@@ -80,12 +83,14 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         addNewPost: builder.mutation({
+            // title, body, userId 들어옴
             query: initialPost => ({
                 url: '/posts',
                 method: 'POST',
                 body: {
+                    // 데이터 오버라이딩: (userId)숫자로  + date, reactions 
                     ...initialPost,
-                    userId: Number(initialPost.userId), // userId 오버라이딩, 숫자로 만들려고
+                    userId: Number(initialPost.userId), 
                     date: new Date().toISOString(),     //현재 날짜와 시간을 ISO 8601 형식으로 반환
                     reactions: {
                         thumbsUp: 0,
@@ -103,6 +108,7 @@ export const extendedApiSlice = apiSlice.injectEndpoints({
             ]
         }),
         updatePost: builder.mutation({
+            // id, title, body, userId 들어옴
             query: initialPost => ({
                 url: `/posts/${initialPost.id}`,
                 method: 'PUT',
